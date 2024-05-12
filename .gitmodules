@@ -1,0 +1,12 @@
+[submodule "pipelines-shared-library"]
+	path = pipelines-shared-library
+	url = https://github.com/troynguyeen/pipelines-shared-library.git
+[submodule "build-shared-library"]
+	path = build-shared-library
+	url = https://github.com/troynguyeen/build-shared-library.git
+[submodule "scan-shared-library"]
+	path = scan-shared-library
+	url = https://github.com/troynguyeen/scan-shared-library.git
+[submodule "deploy-shared-library"]
+	path = deploy-shared-library
+	url = https://github.com/troynguyeen/deploy-shared-library.git
