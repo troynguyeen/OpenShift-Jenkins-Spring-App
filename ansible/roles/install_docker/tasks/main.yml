@@ -1,0 +1,8 @@
+- name: Main task install Docker on RedHat
+  include_tasks: distro/centos.yml
+  when: ansible_os_family == 'RedHat'
+
+- name: Main task install Docker on Debian
+  include_tasks: distro/ubuntu.yml
+  when: ansible_os_family == 'Debian'
+

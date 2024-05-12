@@ -1,0 +1,4 @@
+- name: Reload springapp systemd service
+  systemd:
+    name: springapp
+    state: restarted

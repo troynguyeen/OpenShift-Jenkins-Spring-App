@@ -1,0 +1,11 @@
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name {{ nginx_server }} www.{{ nginx_server }};
+        
+    location / {
+        proxy_pass {{ app_server }};
+        include proxy_params;
+    }
+}

@@ -1,0 +1,21 @@
+deployment:
+  name: springapp-deployment-prod
+  app: springapp-prod
+
+image:
+  repository: nexus.thanhnc85.lab:8082/springapp-prod
+  tag: latest
+
+service:
+  name: springapp-svc-prod
+  port: 8080
+
+ingress:
+  enabled: true
+  name: springapp-ingress-prod
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    host: springapp.thanhnc85.prod
+    paths:
+      path: /

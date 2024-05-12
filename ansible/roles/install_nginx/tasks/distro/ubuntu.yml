@@ -1,0 +1,49 @@
+- name: Update apt
+  apt:
+    name: '*'
+    state: latest
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: Start Nginx service
+  systemd:
+    name: nginx
+    state: started
+    enabled: true
+  register: nginx_service_status
+
+- debug:
+    var: nginx_service_status.status.ActiveState
+
+# Config Nginx as a Reverse Proxy
+
+- name: Create an app domain in Nginx sites-available
+  file:
+    path: /etc/nginx/sites-available/{{ app_domain_name }}
+    state: touch
+    mode: 0755
+
+- name: Add a custom Nginx Reverse Proxy configuration for app domain
+  template:
+    src: roles/install_nginx/templates/nginx.reverse.proxy.j2
+    dest: /etc/nginx/sites-available/{{ app_domain_name }}
+  notify:
+  - Reload Nginx systemd service
+
+- name: Check nginx sites-enabled was existed symbolic link
+  stat:
+    path: /etc/nginx/sites-enabled/{{ app_domain_name }}
+  register: link_result
+
+- name: Create a symbolic link to app domain in sites-available
+  command: ln -s /etc/nginx/sites-available/{{ app_domain_name }} /etc/nginx/sites-enabled/
+  notify:
+    - Reload Nginx systemd service
+  when: not link_result.stat.exists

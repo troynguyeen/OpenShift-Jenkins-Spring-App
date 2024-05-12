@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  springapp:
+    image: ${TAG}
+    environment:
+      SERVER_SERVLET_CONTEXT_PATH: ${CONTEXT_PATH}
+    container_name: ${CONTAINER_NAME}
+    ports:
+      - ${HOST_PORT}:${CONTAINER_PORT}
+    volumes:
+      - ${HOST_DIR}:${CONTAINER_DIR}

@@ -1,0 +1,5 @@
+- name: Docker playbook
+  hosts: docker_install_group
+  become: yes
+  roles:
+    - install_docker

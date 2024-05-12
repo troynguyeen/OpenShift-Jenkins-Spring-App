@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployment.app }}
+    spec:
+      containers:
+        - name: springapp
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          # env:
+          #   - name: SPRING_PROFILES_ACTIVE
+          #     value: "prod"
+          # livenessProbe:
+          #   httpGet:
+          #     path: /actuator/health/liveness
+          #     port: {{ .Values.service.port }}
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 10
+          # readinessProbe:
+          #   httpGet:
+          #     path: /actuator/health/readiness
+          #     port: {{ .Values.service.port }}
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 10
+          volumeMounts:
+            - name: nfs-volume
+              mountPath: /app/log
+      volumes:
+        - name: nfs-volume
+          persistentVolumeClaim:
+            claimName: springapp-pvc
+      serviceAccount: springapp
+      securityContext:
+        runAsUser: 0
+      imagePullSecrets:
+        - name: docker-secret
+---
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#   name: springapp
+# spec:
+#   storageClassName: thanhnc85-nfs-sc
+#   accessModes:
+#     - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 100Mi

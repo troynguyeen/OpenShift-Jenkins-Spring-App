@@ -1,0 +1,1 @@
+exec_start: '/usr/bin/java -jar /usr/local/bin/springapp.jar'

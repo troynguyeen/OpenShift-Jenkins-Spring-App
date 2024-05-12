@@ -1,0 +1,30 @@
+- name: Install yum-utils
+  yum:
+    name: yum-utils
+    state: present
+
+- name: Download Docker CE repository configuration file
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    mode: '0644'
+
+- name: Install docker
+  yum:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+- name: Enable and start docker
+  systemd:
+    name: docker
+    state: started
+    enabled: true
+  register: docker_service_status
+
+- debug:
+    var: docker_service_status.status.ActiveState

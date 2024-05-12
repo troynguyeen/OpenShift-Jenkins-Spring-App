@@ -1,0 +1,48 @@
+- name: Update yum
+  yum:
+    name: '*'
+    state: latest
+
+- name: Update YUM cache
+  yum:
+    update_cache: yes
+
+- name: Install Java 17
+  apt:
+    name: 
+      - java-17-openjdk
+      - java-17-openjdk-devel
+    state: present
+
+- name: Pull artifact from Nexus repository using HTTP
+  get_url:
+    url: '{{ artifact_url }}'
+    dest: '/usr/local/bin/springapp.jar'
+    username: '{{ username_nexus }}'
+    password: '{{ password_nexus }}'
+
+- name: Create springapp.service file
+  file:
+    path: /etc/systemd/system/springapp.service
+    state: touch
+    mode: 0755
+
+- name: Add configuration for springapp.service
+  template:
+    src: roles/install_springapp/templates/springapp.service.j2
+    dest: /etc/systemd/system/springapp.service
+
+- name: Run systemctl daemon-reload to save any changes or configurations
+  command: systemctl daemon-reload
+  notify:
+    - Reload springapp systemd service
+
+- name: Start springapp service
+  systemd:
+    name: springapp
+    state: started
+    enabled: yes
+  register: springapp_service
+
+- debug:
+    var: springapp_service.status.ActiveState

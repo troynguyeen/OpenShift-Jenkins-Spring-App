@@ -1,0 +1,74 @@
+- name: Update apt first
+  apt:
+    update_cache: yes
+
+- name: Install packages to allow apt to use a repository over HTTPS
+  apt:
+    name: 
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+
+- name: Create folder to store Docker’s official GPG key
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: 0755
+
+- name: Check the GPG key is existed
+  stat:
+    path: /etc/apt/keyrings/docker.gpg
+  register: docker_file
+
+- name: Download Docker's official GPG key
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  when: docker_file.stat.exists == false
+
+- name: Set permission to read for all user
+  file:
+    path: /etc/apt/keyrings/docker.gpg
+    state: file
+    mode: a+r
+
+- name: Get architecture information
+  shell:
+    cmd: dpkg --print-architecture
+  register: architecture_info
+
+- name: Get Ubuntu codename
+  shell:
+    cmd: . /etc/os-release && echo "$VERSION_CODENAME"
+  register: codename_info
+
+- name: Add Docker repository to sources.list.d
+  lineinfile:
+    path: /etc/apt/sources.list.d/docker.list
+    line: 'deb [arch={{ architecture_info.stdout }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ codename_info.stdout }} stable'
+    create: yes
+    state: present
+    backup: yes
+
+- name: Update apt
+  apt:
+    update_cache: yes
+
+- name: Install docker
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+- name: Enable and start docker
+  systemd:
+    name: docker
+    state: started
+    enabled: true
+  register: docker_service_status
+
+- debug:
+    var: docker_service_status.status.ActiveState

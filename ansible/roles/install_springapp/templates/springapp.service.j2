@@ -1,0 +1,9 @@
+[Unit]
+Description=webserver Daemon
+
+[Service]
+User=root
+ExecStart={{ exec_start }}
+
+[Install]
+WantedBy=multi-user.target

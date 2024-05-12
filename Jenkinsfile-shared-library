@@ -1,0 +1,3 @@
+@Library(['pipelines-shared-library','build-shared-library','scan-shared-library','deploy-shared-library']) _
+
+scriptedPipelinesOpenShift();

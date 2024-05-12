@@ -1,0 +1,45 @@
+- name: Update apt
+  apt:
+    name: '*'
+    state: latest
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+
+- name: Install Java 17
+  apt:
+    name: 
+      - openjdk-17-jdk
+      - openjdk-17-jre
+    state: present
+
+- name: Pull artifact from Nexus repository using HTTP
+  command: 'curl -L -X GET -u {{ username_nexus }}:{{ password_nexus }} -o /usr/local/bin/springapp.jar "{{ artifact_url }}"'
+
+- name: Create springapp.service file
+  file:
+    path: /etc/systemd/system/springapp.service
+    state: touch
+    mode: 0755
+
+- name: Add configuration for springapp.service
+  template:
+    src: roles/install_springapp/templates/springapp.service.j2
+    dest: /etc/systemd/system/springapp.service
+
+- name: Run systemctl daemon-reload to save any changes or configurations
+  command: systemctl daemon-reload
+  notify:
+    - Reload springapp systemd service
+
+- name: Start springapp service
+  systemd:
+    name: springapp
+    state: started
+    enabled: yes
+  register: springapp_service
+
+- debug:
+    var: springapp_service.status.ActiveState
+

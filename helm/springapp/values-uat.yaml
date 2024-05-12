@@ -1,0 +1,21 @@
+deployment:
+  name: springapp-deployment-uat
+  app: springapp-uat
+
+image:
+  repository: nexus.thanhnc85.lab:8082/springapp-uat
+  tag: latest
+
+service:
+  name: springapp-svc-uat
+  port: 8080
+
+ingress:
+  enabled: true
+  name: springapp-ingress-uat
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    host: springapp.thanhnc85.uat
+    paths:
+      path: /
